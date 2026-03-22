@@ -3,7 +3,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<title>The Translator V1</title>
+<title>The Translator V2</title>
 <link rel="icon" href="icon.png">
 
 <style>
@@ -38,6 +38,10 @@
     color: var(--text-dark);
   }
 
+  h1{
+    text-align: center;
+  }
+
   /* الشريط الجانبي */
   #sidebar {
     width: 280px; /* زيادة قليلة لعرض الشريط الجانبي */
@@ -65,7 +69,7 @@
   #main {
     flex: 1;
     /* 4. إضافة هوامش مناسبة حول المحتوى (فراغ كبير حول الصفحة) */
-    padding: 30px 5%; /* هامش جانبي كبير */
+    padding: 10px 5%; /* هامش جانبي كبير */
     margin-right: 280px;
     transition: margin-right 0.3s;
     position: relative;
@@ -89,6 +93,13 @@
     gap: 15px;
     margin-bottom: 20px;
   }
+
+  /* تنسيق أسم الجلسة */
+  #currentSessionDisplay {
+    display: block;
+    padding-bottom: 10px;
+    margin-top: 20px;
+  }
   
   /* مربع الإدخال والإخراج */
   .translator-box {
@@ -99,7 +110,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 20px;
     position: relative;
-    height: 250px; /* ارتفاع ثابت لمربع الترجمة */
+    min-height: 164px; 
   }
   body.dark .translator-box {
     background: var(--card-dark);
@@ -176,7 +187,6 @@
   /* تنسيق زر التعديل (Edit) */
   .edit-btn {
     background: #ffa726; /* لون برتقالي */
-    padding: 5px 8px;
     font-size: 14px;
     margin-left: 5px;
   }
@@ -276,8 +286,20 @@
       top: 15px;
     }
     .session-item button {
-        margin-right: 0;
+      margin-right: 0;
     }
+  }
+
+  .session-item{
+    padding: 5px; 
+  }
+  .session-item:hover{
+    outline: #4b7bec 2px solid;
+    border-radius: 8px;
+  }
+
+  .word-pair{
+    width: 11%;
   }
 
 </style>
@@ -285,16 +307,17 @@
 
 
 <body>
-<div id="sidebar" class="hidden">
-  <h3>الجلسات</h3>
-  <div id="sessionList"></div>
-  <button onclick="newSession()" title="New session">+ جلسة جديدة</button>
-</div>
-
-<div id="main">
+  <div id="sidebar" class="hidden">
+    <h3>الجلسات</h3>
+    <div id="sessionList"></div>
+    <button onclick="newSession()" title="New session">+ جلسة جديدة</button>
+  </div>
+  
+  <div id="main">
+  <h1>The Atlas Translator</h1>
   <button id="toggleSidebar" title="Side menu">☰</button>
   <button id="darkToggle" title="Change brightness">🌙 الوضع الداكن</button>
-  <h2>المترجم - The Translator</h2>
+  <h2 id="currentSessionDisplay" title="جلسة العمل الحالية"></h2>
   
   <!-- 3. المربعات المتجاورة -->
   <div id="translation-area">
@@ -491,6 +514,7 @@ function editSessionName(oldName) {
 function renderSessions() {
   let box = document.getElementById("sessionList");
   box.innerHTML = "";
+  document.getElementById("currentSessionDisplay").textContent = current;
   
   if (!sessions[DEFAULT_SESSION_NAME]) {
      sessions[DEFAULT_SESSION_NAME] = [];
