@@ -378,26 +378,17 @@ function speakText(text) {
     }
 
     // 2️⃣ fallback بدون await (مهم جدًا)
-  try {
+try {
     const lang = isArabic ? 'ar' : 'en';
 
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+    const url = `https://api.streamelements.com/kappa/v2/speech?voice=${lang === 'ar' ? 'Zeina' : 'Brian'}&text=${encodeURIComponent(text)}`;
 
-    fetch(url)
-        .then(res => res.blob())
-        .then(blob => {
-            const audioUrl = URL.createObjectURL(blob);
-            const audio = new Audio(audioUrl);
+    const audio = new Audio(url);
 
-            audio.play().catch(err => {
-                console.warn("Playback blocked:", err);
-                alert("اضغط مرة تانية لتشغيل الصوت 🔊");
-            });
-        })
-        .catch(err => {
-            console.error("TTS fetch error:", err);
-            alert("فشل تحميل الصوت");
-        });
+    audio.play().catch(err => {
+        console.warn("Playback blocked:", err);
+        alert("اضغط مرة تانية 🔊");
+    });
 
 } catch (err) {
     console.error("TTS error:", err);
