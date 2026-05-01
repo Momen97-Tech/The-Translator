@@ -378,21 +378,29 @@ function speakText(text) {
     }
 
     // 2️⃣ fallback بدون await (مهم جدًا)
-    try {
-        const lang = isArabic ? 'ar' : 'en';
+  try {
+    const lang = isArabic ? 'ar' : 'en';
 
-        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
 
-        const audio = new Audio(url);
+    fetch(url)
+        .then(res => res.blob())
+        .then(blob => {
+            const audioUrl = URL.createObjectURL(blob);
+            const audio = new Audio(audioUrl);
 
-        audio.play().catch(err => {
-            console.warn("Playback blocked:", err);
-            alert("اضغط مرة تانية لتشغيل الصوت 🔊");
+            audio.play().catch(err => {
+                console.warn("Playback blocked:", err);
+                alert("اضغط مرة تانية لتشغيل الصوت 🔊");
+            });
+        })
+        .catch(err => {
+            console.error("TTS fetch error:", err);
+            alert("فشل تحميل الصوت");
         });
 
-    } catch (err) {
-        console.error("TTS error:", err);
-    }
+} catch (err) {
+    console.error("TTS error:", err);
 }
 
 // -------------------------------------------------------------
