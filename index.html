@@ -346,54 +346,40 @@
 
 <script>
 // ---------- إعدادات واجهة برمجة تطبيقات النطق (TTS) ----------
-const synth = window.speechSynthesis;
-
 function speakText(text) {
     if (!text) return;
 
+    const synth = window.speechSynthesis;
+    synth.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    // إجبار إعادة تحميل الأصوات (مهم جدًا على GitHub)
+    const voices = synth.getVoices();
+
     const isArabic = /[\u0600-\u06FF]/.test(text);
 
-    // 1️⃣ محاولة الصوت المحلي
-    if (window.speechSynthesis) {
-        const voices = speechSynthesis.getVoices();
+    let voice = null;
 
-        const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
-        const englishVoice = voices.find(v => v.lang.startsWith('en'));
-
-        const utterance = new SpeechSynthesisUtterance(text);
-
-        if (isArabic && arabicVoice) {
-            utterance.voice = arabicVoice;
-            utterance.lang = arabicVoice.lang;
-        } else if (!isArabic && englishVoice) {
-            utterance.voice = englishVoice;
-            utterance.lang = englishVoice.lang;
-        }
-
-        if ((isArabic && arabicVoice) || (!isArabic && englishVoice)) {
-            speechSynthesis.cancel();
-            speechSynthesis.speak(utterance);
-            return;
-        }
+    if (isArabic) {
+        voice =
+            voices.find(v => v.lang === 'ar-SA') ||
+            voices.find(v => v.lang.startsWith('ar'));
+        utterance.lang = 'ar-SA';
+    } else {
+        voice =
+            voices.find(v => v.lang === 'en-US') ||
+            voices.find(v => v.lang.startsWith('en'));
+        utterance.lang = 'en-US';
     }
 
-    // 2️⃣ fallback بدون await (مهم جدًا)
-try {
-    const lang = isArabic ? 'ar' : 'en';
+    if (voice) utterance.voice = voice;
 
-    const url = `https://api.streamelements.com/kappa/v2/speech?voice=${lang === 'ar' ? 'Zeina' : 'Brian'}&text=${encodeURIComponent(text)}`;
-
-    const audio = new Audio(url);
-
-    audio.play().catch(err => {
-        console.warn("Playback blocked:", err);
-        alert("اضغط مرة تانية 🔊");
-    });
-
-} catch (err) {
-    console.error("TTS error:", err);
+    // مهم جدًا: تأخير صغير لحل bug GitHub Pages
+    setTimeout(() => {
+        synth.speak(utterance);
+    }, 50);
 }
-
 // -------------------------------------------------------------
 
 // ---------- وظيفة النسخ المُحسّنة (1. إصلاح زر النسخ) ----------
