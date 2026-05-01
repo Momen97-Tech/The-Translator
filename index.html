@@ -377,6 +377,8 @@ function speakText(text) {
 
     trySpeak();
 }
+
+  speechSynthesis.getVoices().filter(v => v.lang.startsWith('ar'))
 // -------------------------------------------------------------
 
 // ---------- وظيفة النسخ المُحسّنة (1. إصلاح زر النسخ) ----------
