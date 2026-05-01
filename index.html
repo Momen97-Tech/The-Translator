@@ -346,53 +346,36 @@
 
 <script>
 // ---------- إعدادات واجهة برمجة تطبيقات النطق (TTS) ----------
-const synth = window.speechSynthesis;
-
+// ---------- إعدادات واجهة برمجة تطبيقات النطق (TTS) ----------
 function speakText(text) {
-    if (!text) return;
+    if (!text || !window.speechSynthesis) return;
 
+    speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
     const isArabic = /[\u0600-\u06FF]/.test(text);
+    utterance.lang = isArabic ? 'ar-SA' : 'en-US';
 
-    // 1️⃣ محاولة الصوت المحلي
-    if (window.speechSynthesis) {
+    const trySpeak = () => {
         const voices = speechSynthesis.getVoices();
 
-        const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
-        const englishVoice = voices.find(v => v.lang.startsWith('en'));
-
-        const utterance = new SpeechSynthesisUtterance(text);
-
-        if (isArabic && arabicVoice) {
-            utterance.voice = arabicVoice;
-            utterance.lang = arabicVoice.lang;
-        } else if (!isArabic && englishVoice) {
-            utterance.voice = englishVoice;
-            utterance.lang = englishVoice.lang;
-        }
-
-        if ((isArabic && arabicVoice) || (!isArabic && englishVoice)) {
-            speechSynthesis.cancel();
-            speechSynthesis.speak(utterance);
+        if (voices.length === 0) {
+            speechSynthesis.addEventListener('voiceschanged', trySpeak, { once: true });
             return;
         }
-    }
 
-    // 2️⃣ fallback بدون await (مهم جدًا)
-    try {
-        const lang = isArabic ? 'ar' : 'en';
+        if (isArabic) {
+            const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
+            if (arabicVoice) utterance.voice = arabicVoice;
+        } else {
+            const englishVoice = voices.find(v => v.lang.startsWith('en'));
+            if (englishVoice) utterance.voice = englishVoice;
+        }
 
-        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+        speechSynthesis.speak(utterance);
+    };
 
-        const audio = new Audio(url);
-
-        audio.play().catch(err => {
-            console.warn("Playback blocked:", err);
-            alert("اضغط مرة تانية لتشغيل الصوت 🔊");
-        });
-
-    } catch (err) {
-        console.error("TTS error:", err);
-    }
+    trySpeak();
 }
 // -------------------------------------------------------------
 
