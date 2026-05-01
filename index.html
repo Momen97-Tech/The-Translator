@@ -348,12 +348,12 @@
 // ---------- إعدادات واجهة برمجة تطبيقات النطق (TTS) ----------
 const synth = window.speechSynthesis;
 
-async function speakText(text) {
+function speakText(text) {
     if (!text) return;
 
     const isArabic = /[\u0600-\u06FF]/.test(text);
 
-    // 1️⃣ محاولة استخدام الصوت المحلي
+    // 1️⃣ محاولة الصوت المحلي
     if (window.speechSynthesis) {
         const voices = speechSynthesis.getVoices();
 
@@ -370,7 +370,6 @@ async function speakText(text) {
             utterance.lang = englishVoice.lang;
         }
 
-        // لو فيه صوت مناسب → استخدمه
         if ((isArabic && arabicVoice) || (!isArabic && englishVoice)) {
             speechSynthesis.cancel();
             speechSynthesis.speak(utterance);
@@ -378,17 +377,21 @@ async function speakText(text) {
         }
     }
 
-    // 2️⃣ fallback → Google TTS
+    // 2️⃣ fallback بدون await (مهم جدًا)
     try {
         const lang = isArabic ? 'ar' : 'en';
 
         const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
 
         const audio = new Audio(url);
-        await audio.play();
+
+        audio.play().catch(err => {
+            console.warn("Playback blocked:", err);
+            alert("اضغط مرة تانية لتشغيل الصوت 🔊");
+        });
+
     } catch (err) {
-        console.error("TTS fallback failed:", err);
-        alert("تعذر تشغيل الصوت");
+        console.error("TTS error:", err);
     }
 }
 
