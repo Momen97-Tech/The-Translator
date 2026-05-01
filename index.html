@@ -346,39 +346,25 @@
 
 <script>
 // ---------- إعدادات واجهة برمجة تطبيقات النطق (TTS) ----------
-// ---------- إعدادات واجهة برمجة تطبيقات النطق (TTS) ----------
 function speakText(text) {
-    if (!text || !window.speechSynthesis) return;
-
-    speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
+    if (!text) return;
     const isArabic = /[\u0600-\u06FF]/.test(text);
-    utterance.lang = isArabic ? 'ar-SA' : 'en-US';
-
-    const trySpeak = () => {
-        const voices = speechSynthesis.getVoices();
-
-        if (voices.length === 0) {
-            speechSynthesis.addEventListener('voiceschanged', trySpeak, { once: true });
-            return;
-        }
-
-        if (isArabic) {
-            const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
-            if (arabicVoice) utterance.voice = arabicVoice;
-        } else {
-            const englishVoice = voices.find(v => v.lang.startsWith('en'));
-            if (englishVoice) utterance.voice = englishVoice;
-        }
-
-        speechSynthesis.speak(utterance);
-    };
-
-    trySpeak();
+    const lang = isArabic ? 'ar' : 'en';
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${lang}|${lang}&mt=1&onlyprivate=0&de=a@b.com`;
+    
+    fetch(url)
+        .then(r => r.json())
+        .then(data => {
+            const audioUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${lang}|${lang}&of=audio`;
+            const audio = new Audio(audioUrl);
+            audio.play().catch(() => {
+                // fallback للـ Web Speech API
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = isArabic ? 'ar' : 'en';
+                speechSynthesis.speak(utterance);
+            });
+        });
 }
-
-  speechSynthesis.getVoices().filter(v => v.lang.startsWith('ar'))
 // -------------------------------------------------------------
 
 // ---------- وظيفة النسخ المُحسّنة (1. إصلاح زر النسخ) ----------
