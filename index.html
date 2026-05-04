@@ -3,7 +3,8 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<title>The Translator V3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Translator V4</title>
 <link rel="icon" href="icon.png">
 
 <style>
@@ -18,11 +19,15 @@
       --text-dark: #ecf0f1;
       --border-color-light: #dcdcdc;
       --border-color-dark: #555;
-      --font-family: 'Verdana', sans-serif; /* الحفاظ على خط المستخدم الأصلي للترجمة */
+      --font-family: 'Verdana', sans-serif;
       --general-font: 'Segoe UI', Tahoma, Geneva, sans-serif;
+      --sidebar-width: 280px;
   }
 
-  /* 4. أجعل اطراف الصفحة فارفة (إضافة هوامش كبيرة) */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
   body {
     font-family: var(--general-font);
     margin: 0;
@@ -30,27 +35,39 @@
     background: var(--bg-light);
     color: var(--text-light);
     display: flex;
+    justify-content: center;
     transition: background 0.3s, color 0.3s;
     min-height: 100vh;
+    overflow-x: hidden;
   }
   body.dark {
     background: var(--bg-dark);
     color: var(--text-dark);
   }
 
-  h1{
+  h1 {
     text-align: center;
+    font-size: clamp(1.3rem, 4vw, 2rem);
+    margin: 10px 0;
   }
 
-  /* الشريط الجانبي */
+  h2 {
+    font-size: clamp(1rem, 3vw, 1.5rem);
+  }
+
+  h3 {
+    font-size: clamp(0.95rem, 2.5vw, 1.2rem);
+  }
+
+  /* ===== SIDEBAR ===== */
   #sidebar {
-    width: 280px; /* زيادة قليلة لعرض الشريط الجانبي */
+    width: var(--sidebar-width);
     background: var(--card-light);
     border-left: 1px solid var(--border-color-light);
     height: 100vh;
     padding: 20px;
     overflow-y: auto;
-    transition: transform 0.3s;
+    transition: transform 0.3s ease;
     position: fixed;
     right: 0;
     top: 0;
@@ -65,58 +82,70 @@
     transform: translateX(100%);
   }
 
-  /* المحتوى الرئيسي */
+  /* Overlay for mobile sidebar */
+  #sidebarOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 999;
+  }
+  #sidebarOverlay.active {
+    display: block;
+  }
+
+  /* ===== MAIN CONTENT ===== */
   #main {
     flex: 1;
-    /* 4. إضافة هوامش مناسبة حول المحتوى (فراغ كبير حول الصفحة) */
-    padding: 10px 5%; /* هامش جانبي كبير */
-    margin-right: 280px;
-    transition: margin-right 0.3s;
-    position: relative;
-    max-width: 1200px; /* تحديد أقصى عرض لـ #main على الشاشات الكبيرة */
-    margin-left: auto; /* لتوسيط المحتوى */
-    margin-right: 280px;
+    padding: 10px 5%;
+    padding-right: calc(5% + var(--sidebar-width));
+    transition: padding-right 0.3s;
+    max-width: 1200px;
+    width: 100%;
   }
-  #sidebar.hidden + #main {
-    margin-right: 0;
-  }
-  /* توسيط المحتوى عند إخفاء الشريط الجانبي */
-  #sidebar.hidden + #main {
-    margin-right: auto;
+  #sidebar.hidden ~ #main {
     padding-right: 5%;
   }
 
-  /* 3. تصميم المتجاور - حاوية الإدخال والترجمة */
+  /* ===== TOP BUTTONS ===== */
+  #topButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  /* ===== TRANSLATION AREA ===== */
   #translation-area {
     display: flex;
-    flex-direction: row; /* متجاور افتراضيًا */
+    flex-direction: row;
     gap: 15px;
     margin-bottom: 20px;
   }
 
-  /* تنسيق أسم الجلسة */
   #currentSessionDisplay {
     display: block;
     padding-bottom: 10px;
-    margin-top: 20px;
+    margin-top: 10px;
+    word-break: break-word;
   }
-  
-  /* مربع الإدخال والإخراج */
+
+  /* ===== TRANSLATOR BOX ===== */
   .translator-box {
     flex: 1;
-    min-width: 0; /* مهم لـ flexbox */
+    min-width: 0;
     background: var(--card-light);
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 20px;
     position: relative;
-    min-height: 164px; 
+    min-height: 164px;
   }
   body.dark .translator-box {
     background: var(--card-dark);
   }
-  
-  /* تنسيق حقل النص داخل المربع */
+
   .translator-box textarea {
     width: 100%;
     height: 100%;
@@ -125,7 +154,7 @@
     padding: 0;
     margin: 0;
     background: transparent;
-    font-size: 24px; /* الحفاظ على حجم الخط */
+    font-size: 24px;
     line-height: 1.5;
     font-family: var(--font-family);
     color: var(--text-light);
@@ -134,19 +163,16 @@
   body.dark .translator-box textarea {
     color: var(--text-dark);
   }
-  
-  /* تخصيص خاص لمربع الإدخال */
+
   #input-box textarea {
     font-weight: normal;
   }
-
-  /* تخصيص خاص لمربع الإخراج */
   #output-box textarea {
     font-weight: bold;
-    direction: rtl; /* ضمان عرض الترجمة العربية بشكل صحيح */
+    direction: rtl;
   }
 
-  /* تنسيق زر النطق (Speaker) داخل الصندوق */
+  /* ===== SPEAK BUTTON ===== */
   .speak-btn {
     position: absolute;
     bottom: 10px;
@@ -165,8 +191,8 @@
     opacity: 1;
     color: var(--primary-hover);
   }
-  
-  /* أزرار الإجراءات الرئيسية */
+
+  /* ===== BUTTONS ===== */
   button {
     padding: 10px 18px;
     border: none;
@@ -175,18 +201,18 @@
     background: var(--primary-color);
     color: white;
     margin: 4px 2px;
-    font-size: 16px;
+    font-size: clamp(13px, 2vw, 16px);
     transition: background 0.2s, transform 0.1s;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
   }
   button:hover {
     background: var(--primary-hover);
     transform: translateY(-1px);
   }
 
-  /* تنسيق زر التعديل (Edit) */
   .edit-btn {
-    background: #ffa726; /* لون برتقالي */
+    background: #ffa726;
     font-size: 14px;
     margin-left: 5px;
   }
@@ -194,8 +220,15 @@
     background: #fb8c00;
   }
 
+  /* ===== ACTION BUTTONS ===== */
+  #actionButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
 
-  /* قائمة الكلمات المحفوظة */
+  /* ===== WORD LIST ===== */
   .word-list div {
     padding: 8px 12px;
     background: var(--card-light);
@@ -206,40 +239,41 @@
     align-items: center;
     cursor: grab;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    flex-wrap: wrap;
+    gap: 6px;
   }
   body.dark .word-list div {
     background: var(--card-dark);
     border-color: var(--border-color-dark);
   }
-  
+
   .word-list .word-pair {
     flex-grow: 1;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    flex-wrap: wrap; /* للسماح بالعناصر بالتكسير على خطوط متعددة */
+    flex-wrap: wrap;
     cursor: pointer;
-    font-size: 15px;
+    font-size: clamp(13px, 2vw, 15px);
     padding: 0;
+    min-width: 120px;
   }
 
-  /* الأزرار داخل قائمة الكلمات المحفوظة */
   .word-list .controls {
     display: flex;
     align-items: center;
     flex-shrink: 0;
   }
-  
+
   .word-list button {
     padding: 4px 6px;
     margin: 0 3px;
     font-size: 14px;
     box-shadow: none;
   }
-  
-  /* زر النسخ الجديد (لكل كلمة في القائمة) */
+
   .copy-btn-word {
-    background: #6c757d; /* رمادي لزر النسخ */
+    background: #6c757d;
     margin-left: 5px;
     margin-right: 5px;
   }
@@ -256,57 +290,137 @@
     margin-right: 5px;
   }
 
-  /* الاستجابة للهواتف المحمولة */
-  @media (max-width: 900px) {
-    #translation-area {
-      flex-direction: column; /* تتراكم رأسياً على الشاشات الصغيرة */
-    }
-    .translator-box {
-      height: 150px; /* ارتفاع أقل للموبايل */
-    }
-    #main {
-      padding: 20px;
-      margin-right: 0; /* إلغاء هامش الشريط الجانبي */
-      max-width: 100%;
-    }
-    #sidebar {
-      width: 100%;
-      height: 50vh;
-      transform: translateY(100%);
-      bottom: 0;
-      top: auto;
-      border-left: none;
-      border-top: 1px solid var(--border-color-light);
-    }
-    #sidebar.hidden {
-      transform: translateY(0%);
-    }
-    #toggleSidebar {
-      right: 15px;
-      top: 15px;
-    }
-    .session-item button {
-      margin-right: 0;
-    }
+  /* ===== SESSION ITEMS ===== */
+  .session-item {
+    padding: 5px;
   }
-
-  .session-item{
-    padding: 5px; 
-  }
-  .session-item:hover{
+  .session-item:hover {
     outline: #4b7bec 2px solid;
     border-radius: 8px;
   }
 
-  .word-pair{
-    width: 11%;
+  /* ===== RESPONSIVE: TABLET (max 900px) ===== */
+  @media (max-width: 900px) {
+    :root {
+      --sidebar-width: 0px;
+    }
+
+    #sidebar {
+      width: min(320px, 85vw);
+      height: 100vh;
+      top: 0;
+      right: 0;
+      bottom: auto;
+      border-left: 1px solid var(--border-color-light);
+      border-top: none;
+      transform: translateX(100%);
+    }
+    #sidebar.hidden {
+      transform: translateX(100%);
+    }
+    #sidebar.open {
+      transform: translateX(0);
+    }
+
+    #main {
+      margin-right: 0 !important;
+      padding: 12px 4%;
+      max-width: 100%;
+    }
+
+    #translation-area {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .translator-box {
+      min-height: 140px;
+    }
   }
 
+  /* ===== RESPONSIVE: MOBILE (max 600px) ===== */
+  @media (max-width: 600px) {
+    h1 {
+      font-size: 1.3rem;
+    }
+
+    #main {
+      padding: 10px 3%;
+    }
+
+    #topButtons {
+      gap: 4px;
+    }
+
+    button {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .translator-box {
+      padding: 14px 14px 40px 14px;
+      min-height: 130px;
+    }
+
+    .translator-box textarea {
+      font-size: 16px;
+      min-height: 90px;
+    }
+
+    .word-list div {
+      padding: 8px;
+    }
+
+    .word-list .word-pair {
+      min-width: 100px;
+      font-size: 13px;
+    }
+
+    .word-list button {
+      font-size: 12px;
+      padding: 3px 5px;
+    }
+
+    #actionButtons button {
+      flex: 1;
+      min-width: 80px;
+    }
+  }
+
+  /* ===== RESPONSIVE: SMALL MOBILE (max 380px) ===== */
+  @media (max-width: 380px) {
+    #main {
+      padding: 8px 2%;
+    }
+
+    .translator-box {
+      padding: 10px 10px 38px 10px;
+    }
+
+    .translator-box textarea {
+      font-size: 15px;
+    }
+
+    button {
+      padding: 7px 10px;
+      font-size: 12px;
+    }
+  }
+
+  /* ===== RESPONSIVE: LARGE SCREENS (min 1400px) ===== */
+  @media (min-width: 1400px) {
+    #main {
+      padding: 10px 8%;
+    }
+  }
 </style>
 </head>
 
 
 <body>
+  <!-- Overlay for sidebar on mobile -->
+  <div id="sidebarOverlay"></div>
+
   <div id="sidebar" class="hidden">
     <h3>الجلسات</h3>
     <div id="sessionList"></div>
@@ -314,76 +428,86 @@
   </div>
   
   <div id="main">
-  <h1>The Atlas Translator</h1>
-  <button id="toggleSidebar" title="Side menu">☰</button>
-  <button id="darkToggle" title="Change brightness">🌙 الوضع الداكن</button>
-  <h2 id="currentSessionDisplay" title="جلسة العمل الحالية"></h2>
-  
-  <!-- 3. المربعات المتجاورة -->
-  <div id="translation-area">
+    <h1>The Atlas Translator</h1>
+
+    <div id="topButtons">
+      <button id="toggleSidebar" title="Side menu">☰</button>
+      <button id="darkToggle" title="Change brightness">🌙 الوضع الداكن</button>
+    </div>
+
+    <h2 id="currentSessionDisplay" title="جلسة العمل الحالية"></h2>
     
-    <!-- مربع الإدخال -->
-    <div id="input-box" class="translator-box">
-        <textarea id="inputWord" placeholder="اكتب النص هنا..." oninput="handleInput()"></textarea>
-        <button class="speak-btn" onclick="speakText(document.getElementById('inputWord').value)" title="Listen">🔊</button>
+    <div id="translation-area">
+      <!-- مربع الإدخال -->
+      <div id="input-box" class="translator-box">
+          <textarea id="inputWord" placeholder="اكتب النص هنا..." oninput="handleInput()"></textarea>
+          <button class="speak-btn" onclick="speakText(document.getElementById('inputWord').value)" title="Listen">🔊</button>
+      </div>
+      
+      <!-- مربع الإخراج -->
+      <div id="output-box" class="translator-box">
+          <textarea id="outputWord" placeholder="الترجمة..." readonly></textarea>
+          <button class="speak-btn" onclick="speakText(document.getElementById('outputWord').value)" title="Listen">🔊</button>
+      </div>
     </div>
     
-    <!-- مربع الإخراج (الترجمة) -->
-    <div id="output-box" class="translator-box">
-        <textarea id="outputWord" placeholder="الترجمة..." readonly></textarea>
-        <button class="speak-btn" onclick="speakText(document.getElementById('outputWord').value)" title="Listen">🔊</button>
+    <div id="actionButtons">
+      <button onclick="saveWord()" title="Save">💾</button>
+      <button onclick="clearOutput()" title="Delete">✖</button>
     </div>
+    
+    <h3>الكلمات المحفوظة - Saved words 💾</h3>
+    <div id="savedWords" class="word-list"></div>
   </div>
-  
-  <div id="actionButtons">
-    <button onclick="saveWord()" title="Save">💾</button>
-    <button onclick="clearOutput()" title="Delete">✖</button>
-  </div>
-  
-  <h3>الكلمات المحفوظة - Saved words 💾</h3>
-  <div id="savedWords" class="word-list"></div>
-</div>
 
 <script>
-// ---------- إعدادات واجهة برمجة تطبيقات النطق (TTS) ----------
+// ---------- TTS ----------
+const synth = window.speechSynthesis;
+
 function speakText(text) {
     if (!text) return;
     const isArabic = /[\u0600-\u06FF]/.test(text);
-    const lang = isArabic ? 'ar' : 'en';
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${lang}|${lang}&mt=1&onlyprivate=0&de=a@b.com`;
-    
-    fetch(url)
-        .then(r => r.json())
-        .then(data => {
-            const audioUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${lang}|${lang}&of=audio`;
-            const audio = new Audio(audioUrl);
-            audio.play().catch(() => {
-                // fallback للـ Web Speech API
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = isArabic ? 'ar' : 'en';
-                speechSynthesis.speak(utterance);
-            });
+    if (window.speechSynthesis) {
+        const voices = speechSynthesis.getVoices();
+        const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
+        const englishVoice = voices.find(v => v.lang.startsWith('en'));
+        const utterance = new SpeechSynthesisUtterance(text);
+        if (isArabic && arabicVoice) {
+            utterance.voice = arabicVoice;
+            utterance.lang = arabicVoice.lang;
+        } else if (!isArabic && englishVoice) {
+            utterance.voice = englishVoice;
+            utterance.lang = englishVoice.lang;
+        }
+        if ((isArabic && arabicVoice) || (!isArabic && englishVoice)) {
+            speechSynthesis.cancel();
+            speechSynthesis.speak(utterance);
+            return;
+        }
+    }
+    try {
+        const lang = isArabic ? 'ar' : 'en';
+        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+        const audio = new Audio(url);
+        audio.play().catch(err => {
+            console.warn("Playback blocked:", err);
+            alert("عذراً حدث خطأ أثناء نطق الترجمة 🔊🚫");
         });
+    } catch (err) {
+        console.error("TTS error:", err);
+    }
 }
-// -------------------------------------------------------------
 
-// ---------- وظيفة النسخ المُحسّنة (1. إصلاح زر النسخ) ----------
+// ---------- Copy ----------
 async function copyText(e, textToCopy) {
     e.stopPropagation();
-    
-    // محاولة استخدام واجهة برمجة تطبيقات الحافظة الحديثة
     if (navigator.clipboard) {
         try {
             await navigator.clipboard.writeText(textToCopy);
             showCopyFeedback(e.currentTarget);
         } catch (err) {
-            console.error('Failed to copy using modern API. Falling back to execCommand:', err);
-            // Fallback (قد لا يعمل في جميع الـ iFrames)
-            if (document.execCommand) {
-                 fallbackCopy(textToCopy, e.currentTarget);
-            } else {
-                 alert('النسخ فشل. متصفحك لا يدعم واجهات النسخ المتقدمة.');
-            }
+            if (document.execCommand) fallbackCopy(textToCopy, e.currentTarget);
+            else alert('النسخ فشل. متصفحك لا يدعم واجهات النسخ المتقدمة.');
         }
     } else if (document.execCommand) {
         fallbackCopy(textToCopy, e.currentTarget);
@@ -412,14 +536,10 @@ function fallbackCopy(text, button) {
 function showCopyFeedback(button) {
     const originalText = button.textContent;
     button.textContent = '✅';
-    setTimeout(() => {
-        button.textContent = originalText;
-    }, 1500);
+    setTimeout(() => { button.textContent = originalText; }, 1500);
 }
-// -------------------------------------------------------------
 
-
-// ---------- إدارة الجلسات ----------
+// ---------- Sessions ----------
 const DEFAULT_SESSION_NAME = "جلسة العمل الحالية";
 
 (function applySavedTheme() {
@@ -447,50 +567,68 @@ if (Object.keys(sessions).length === 0) {
 }
 
 let current = localStorage.getItem("currentSession") || DEFAULT_SESSION_NAME;
-
-if (!sessions[current]) {
-    current = DEFAULT_SESSION_NAME;
-}
+if (!sessions[current]) current = DEFAULT_SESSION_NAME;
 
 let dragSrcIndex = null;
 renderSessions();
 renderWords();
 
+// ---------- Sidebar ----------
+function openSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebarOverlay");
+  sidebar.classList.remove("hidden");
+  if (window.innerWidth <= 900) {
+    sidebar.classList.add("open");
+    overlay.classList.add("active");
+  }
+}
+
+function closeSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebarOverlay");
+  sidebar.classList.remove("open");
+  overlay.classList.remove("active");
+  if (window.innerWidth > 900) {
+    sidebar.classList.add("hidden");
+  } else {
+    sidebar.classList.add("hidden");
+  }
+}
+
+document.getElementById("toggleSidebar").onclick = () => {
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar.classList.contains("hidden")) {
+    openSidebar();
+  } else {
+    closeSidebar();
+  }
+};
+
+document.getElementById("sidebarOverlay").onclick = () => {
+  closeSidebar();
+};
+
+// ---------- Session Logic ----------
 function newSession() {
   let name = prompt("اسم الجلسة الجديدة:");
   if (!name) return;
-  
-  if (sessions[name]) {
-    alert("هذا الاسم مستخدم بالفعل!");
-    return;
-  }
+  if (sessions[name]) { alert("هذا الاسم مستخدم بالفعل!"); return; }
   sessions[name] = [];
   current = name;
   saveSessions();
   renderSessions();
   renderWords();
-  document.getElementById("sidebar").classList.add("hidden");
+  closeSidebar();
 }
 
-// 2. أمكانية تعديل أسم الجلسة
 function editSessionName(oldName) {
     let newName = prompt(`تعديل اسم الجلسة "${oldName}":`, oldName);
     if (!newName || newName === oldName || !newName.trim()) return;
-
-    if (sessions[newName]) {
-        alert("هذا الاسم مستخدم بالفعل أو هو اسم الجلسة الافتراضية.");
-        return;
-    }
-
-    // نقل البيانات إلى الاسم الجديد
+    if (sessions[newName]) { alert("هذا الاسم مستخدم بالفعل أو هو اسم الجلسة الافتراضية."); return; }
     sessions[newName] = sessions[oldName];
     delete sessions[oldName];
-    
-    // تحديث الجلسة الحالية
-    if (current === oldName) {
-        current = newName;
-    }
-    
+    if (current === oldName) current = newName;
     saveSessions();
     renderSessions();
 }
@@ -499,47 +637,23 @@ function renderSessions() {
   let box = document.getElementById("sessionList");
   box.innerHTML = "";
   document.getElementById("currentSessionDisplay").textContent = current;
-  
-  if (!sessions[DEFAULT_SESSION_NAME]) {
-     sessions[DEFAULT_SESSION_NAME] = [];
-  }
-  
+  if (!sessions[DEFAULT_SESSION_NAME]) sessions[DEFAULT_SESSION_NAME] = [];
   localStorage.setItem("currentSession", current);
 
   for (let s in sessions) {
     let div = document.createElement("div");
     div.className = "session-item";
-    
-    if (s === current) {
-      div.classList.add("active");
-    }
-    
+    if (s === current) div.classList.add("active");
     let isDefault = (s === DEFAULT_SESSION_NAME);
-    
-    // إضافة زر التعديل إذا لم تكن جلسة العمل الافتراضية
-    let editBtnHtml = !isDefault
-      ? `<button class="edit-btn" onclick="editSessionName('${s}')" title="Name change">✏️</button>`
-      : ''; 
-      
-    let deleteBtnHtml = !isDefault
-      ? `<button onclick="deleteSession(event, '${s}')" title="Delete">✖</button>`
-      : '';
-      
-    div.innerHTML = `
-        <span>${s}</span>
-        <div>
-            ${editBtnHtml}
-            ${deleteBtnHtml}
-        </div>
-    `;
-    
+    let editBtnHtml = !isDefault ? `<button class="edit-btn" onclick="editSessionName('${s}')" title="Name change">✏️</button>` : '';
+    let deleteBtnHtml = !isDefault ? `<button onclick="deleteSession(event, '${s}')" title="Delete">✖</button>` : '';
+    div.innerHTML = `<span>${s}</span><div>${editBtnHtml}${deleteBtnHtml}</div>`;
     div.onclick = (e) => {
-      // التأكد من عدم النقر على زر الحذف أو التعديل
       if (e.target.tagName !== "BUTTON") {
         current = s;
         renderSessions();
         renderWords();
-        document.getElementById("sidebar").classList.add("hidden");
+        closeSidebar();
       }
     };
     box.appendChild(div);
@@ -549,9 +663,7 @@ function renderSessions() {
 function deleteSession(e, name) {
   e.stopPropagation();
   delete sessions[name];
-  if (current === name) {
-    current = DEFAULT_SESSION_NAME; 
-  }
+  if (current === name) current = DEFAULT_SESSION_NAME;
   saveSessions();
   renderSessions();
   renderWords();
@@ -564,33 +676,25 @@ function renderWords() {
     box.innerHTML = `<p>اختر جلسة أو ابدأ جلسة جديدة لحفظ الكلمات. (الجلسة الحالية: ${current})</p>`;
     return;
   }
-  
   sessions[current].forEach((w, i) => {
-    // 1. إضافة زر نسخ للكلمة الأصلية (w[0]) و زر نسخ للترجمة (w[1])
     let d = document.createElement("div");
     d.draggable = true;
     d.dataset.index = i;
-    
-    // لتبسيط الكود، نستخدم backticks ` ولغة Escape للحماية
     d.innerHTML = `
       <div class="word-pair">
-        <!-- أزرار الكلمة الأصلية -->
-        <button class="speak-btn" onclick="speakText('${w[0].replace(/'/g, "\\'")}')"  title="Listen">🔊</button> 
+        <button class="speak-btn" onclick="speakText('${w[0].replace(/'/g, "\\'")}')" title="Listen">🔊</button>
         <button class="copy-btn-word" onclick="copyText(event, \`${w[0].replace(/`/g, '\\`').replace(/'/g, "\\'")}\`)" title="Copy">📋</button>
         <span onclick="loadWord('${w[0].replace(/'/g, "\\'")}', '${w[1].replace(/'/g, "\\'")}')">${w[0]}</span>
       </div>
-       
       <div class="word-pair">
-        <!-- أزرار الترجمة -->
-        <button class="speak-btn" onclick="speakText('${w[1].replace(/'/g, "\\'")}')"  title="Listen">🔊</button>
-        <button class="copy-btn-word" onclick="copyText(event, \`${w[1].replace(/`/g, '\\`').replace(/'/g, "\\'")}\`)" title="Copy" >📋</button>
+        <button class="speak-btn" onclick="speakText('${w[1].replace(/'/g, "\\'")}')" title="Listen">🔊</button>
+        <button class="copy-btn-word" onclick="copyText(event, \`${w[1].replace(/`/g, '\\`').replace(/'/g, "\\'")}\`)" title="Copy">📋</button>
         <span onclick="loadWord('${w[0].replace(/'/g, "\\'")}', '${w[1].replace(/'/g, "\\'")}')">${w[1]}</span>
       </div>
       <div class="controls">
         <button onclick="del(event, ${i})" title="Delete">✖</button>
       </div>
     `;
-    
     d.addEventListener("dragstart", dragStart);
     d.addEventListener("dragover", dragOver);
     d.addEventListener("drop", drop);
@@ -615,14 +719,10 @@ function dragOver(e) {
 }
 function drop(e) {
   e.preventDefault();
-  let targetEl = e.currentTarget;
-  let targetIndex = targetEl.dataset.index;
-  
+  let targetIndex = e.currentTarget.dataset.index;
   if (dragSrcIndex === null || targetIndex === dragSrcIndex) return;
-
   let itemToMove = sessions[current].splice(dragSrcIndex, 1)[0];
   sessions[current].splice(targetIndex, 0, itemToMove);
-  
   dragSrcIndex = null;
   saveSessions();
   renderWords();
@@ -635,15 +735,9 @@ function dragEnd(e) {
 function saveWord() {
   let w = document.getElementById("inputWord").value.trim();
   if (!w) return;
-  
   if (!current) current = DEFAULT_SESSION_NAME;
-
   let t = document.getElementById("outputWord").value.trim();
-  if (!t || t === "يتم الترجمة...") {
-    alert("الرجاء انتظار ظهور الترجمة أولاً.");
-    return;
-  }
-  
+  if (!t || t === "يتم الترجمة...") { alert("الرجاء انتظار ظهور الترجمة أولاً."); return; }
   sessions[current].push([w, t]);
   saveSessions();
   renderWords();
@@ -673,10 +767,7 @@ async function translate(text) {
     let isArabic = /[\u0600-\u06FF]/.test(text);
     let targetLang = isArabic ? "en" : "ar";
     let sourceLang = isArabic ? "ar" : (/[a-zA-Z]/.test(text) ? "en" : "auto");
-    
-    let r = await fetch(
-      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
-    );
+    let r = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
     let data = await r.json();
     return data[0].map(segment => segment[0]).join('');
   } catch (e) {
@@ -685,27 +776,15 @@ async function translate(text) {
   }
 }
 
-// استخدام دالة واحدة للتعامل مع الإدخال (مع Debouncing)
 function handleInput() {
     clearTimeout(debounceTimer);
     let text = inputWord.value.trim();
-    if (!text) {
-        outputWord.value = "";
-        return;
-    }
-    
+    if (!text) { outputWord.value = ""; return; }
     outputWord.value = "يتم الترجمة...";
-    
     debounceTimer = setTimeout(async () => {
         outputWord.value = await translate(text);
     }, 500);
 }
-
-// -- ربط الأحداث --
-
-document.getElementById("toggleSidebar").onclick = () => {
-  document.getElementById("sidebar").classList.toggle("hidden");
-};
 
 document.getElementById("darkToggle").onclick = () => {
   document.body.classList.toggle("dark");
