@@ -1,10 +1,22 @@
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The Translator V5</title>
+<title>تطبيق ترجم - مترجم عربي إنجليزي مجاني | Tarjim App</title>
+<meta name="description" content="تطبيق ترجم: أداة ترجمة فورية بين العربية والإنجليزية، مع حفظ الكلمات في جلسات منظمة، اختبارات تفاعلية لتثبيت المفردات، ونطق صوتي. مجاني بالكامل وبدون تسجيل.">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="تطبيق ترجم - مترجم عربي إنجليزي مجاني">
+<meta property="og:description" content="ترجم كلماتك بين العربية والإنجليزية، احفظها في جلسات، واختبر نفسك فيها لاحقًا. أداة بسيطة ومجانية بالكامل.">
+<meta property="og:image" content="icon.png">
+<meta property="og:locale" content="ar_AR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="تطبيق ترجم - مترجم عربي إنجليزي مجاني">
+<meta name="twitter:description" content="ترجم كلماتك بين العربية والإنجليزية، احفظها، واختبر نفسك فيها لاحقًا.">
+<meta name="twitter:image" content="icon.png">
+
 <link rel="icon" href="icon.png">
 
 <style>
@@ -191,6 +203,13 @@
   #output-box textarea {
     font-weight: bold;
     direction: rtl;
+  }
+  #output-box textarea:focus {
+    background: rgba(75, 123, 236, 0.06);
+    border-radius: 6px;
+  }
+  body.dark #output-box textarea:focus {
+    background: rgba(75, 123, 236, 0.15);
   }
 
   /* ===== SPEAK BUTTON ===== */
@@ -514,6 +533,21 @@
       padding: 10px 8%;
     }
   }
+
+  /* ===== FOOTER ===== */
+  #siteFooter {
+    text-align: center;
+    padding: 24px 0 12px 0;
+    font-size: 13px;
+    color: #888;
+  }
+  #siteFooter a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  #siteFooter a:hover {
+    text-decoration: underline;
+  }
 </style>
 </head>
 
@@ -546,7 +580,7 @@
       </div>
 
       <div id="output-box" class="translator-box">
-        <textarea id="outputWord" placeholder="الترجمة..." readonly></textarea>
+        <textarea id="outputWord" placeholder="الترجمة..." title="يمكنك تعديل الترجمة قبل الحفظ" oninput="autoResize()"></textarea>
         <button class="speak-btn" id="speakOutput" onclick="toggleSpeak('outputWord', 'speakOutput')" title="Listen">🔊</button>
       </div>
     </div>
@@ -570,6 +604,10 @@
     </div>
 
     <div id="savedWords" class="word-list"></div>
+
+    <div id="siteFooter">
+      <a href="privacy-policy.html">سياسة الخصوصية</a>
+    </div>
   </div>
 
 <script>
@@ -728,6 +766,15 @@ function showCopyFeedback(button) {
 // ===== Sessions =====
 const DEFAULT_SESSION_NAME = "جلسة العمل الحالية";
 
+// تحييد أي وسوم HTML قبل عرض نص قادم من المستخدم، لمنع هجمات XSS
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 (function applySavedTheme() {
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme === 'dark') {
@@ -836,9 +883,9 @@ function renderSessions() {
     div.className = "session-item";
     if (s === current) div.classList.add("active");
     let isDefault = (s === DEFAULT_SESSION_NAME);
-    let editBtnHtml   = !isDefault ? `<button class="edit-btn" onclick="editSessionName('${s}'), clickSound()" title="Change name">✏️</button>` : '';
-    let deleteBtnHtml = !isDefault ? `<button onclick="deleteSession(event, '${s}'), clickSound()" title="Delete">✖</button>` : '';
-    div.innerHTML = `<span>${s}</span><div>${editBtnHtml}${deleteBtnHtml}</div>`;
+    let editBtnHtml   = !isDefault ? `<button class="edit-btn" onclick="editSessionName('${s.replace(/'/g, "\\'")}'), clickSound()" title="Change name">✏️</button>` : '';
+    let deleteBtnHtml = !isDefault ? `<button onclick="deleteSession(event, '${s.replace(/'/g, "\\'")}'), clickSound()" title="Delete">✖</button>` : '';
+    div.innerHTML = `<span>${escapeHtml(s)}</span><div>${editBtnHtml}${deleteBtnHtml}</div>`;
     div.onclick = (e) => {
       if (e.target.tagName !== "BUTTON") {
         current = s;
@@ -864,7 +911,7 @@ function renderWords() {
   let box = document.getElementById("savedWords");
   box.innerHTML = "";
   if (!current || !sessions[current]) {
-    box.innerHTML = `<p>اختر جلسة أو ابدأ جلسة جديدة لحفظ الكلمات. (الجلسة الحالية: ${current})</p>`;
+    box.innerHTML = `<p>اختر جلسة أو ابدأ جلسة جديدة لحفظ الكلمات. (الجلسة الحالية: ${escapeHtml(current)})</p>`;
     updateCounter(0);
     return;
   }
@@ -880,12 +927,12 @@ function renderWords() {
       <div class="word-pair">
         <button class="speak-btn" onclick="speakText('${w[0].replace(/'/g, "\\'")}', null)" title="Listen">🔊</button>
         <button class="copy-btn-word" onclick="copyText(event, \`${w[0].replace(/`/g, '\\`').replace(/'/g, "\\'")}\`)" title="Copy">📋</button>
-        <span onclick="loadWord('${w[0].replace(/'/g, "\\'")}', '${w[1].replace(/'/g, "\\'")}')">${w[0]}</span>
+        <span onclick="loadWord('${w[0].replace(/'/g, "\\'")}', '${w[1].replace(/'/g, "\\'")}')">${escapeHtml(w[0])}</span>
       </div>
       <div class="word-pair">
         <button class="speak-btn" onclick="speakText('${w[1].replace(/'/g, "\\'")}', null)" title="Listen">🔊</button>
         <button class="copy-btn-word" onclick="copyText(event, \`${w[1].replace(/`/g, '\\`').replace(/'/g, "\\'")}\`)" title="Copy">📋</button>
-        <span onclick="loadWord('${w[0].replace(/'/g, "\\'")}', '${w[1].replace(/'/g, "\\'")}')">${w[1]}</span>
+        <span onclick="loadWord('${w[0].replace(/'/g, "\\'")}', '${w[1].replace(/'/g, "\\'")}')">${escapeHtml(w[1])}</span>
       </div>
       <div class="controls">
         <button onclick="del(event, ${i})" title="Delete">✖</button>
@@ -967,10 +1014,17 @@ async function translate(text) {
   try {
     let isArabic   = /[\u0600-\u06FF]/.test(text);
     let targetLang = isArabic ? "en" : "ar";
-    let sourceLang = isArabic ? "ar" : (/[a-zA-Z]/.test(text) ? "en" : "auto");
-    let r    = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
+    let sourceLang = isArabic ? "ar" : "en";
+    // تكبير أول حرف من النص الإنجليزي فقط (الكتابة السليمة)، لتقليل تضارب نتائج MyMemory بسبب حالة الأحرف
+    // لا يؤثر على النص المعروض في مربع الإدخال، فقط على النسخة المُرسلة للترجمة
+    let textForApi = isArabic ? text : text.charAt(0).toUpperCase() + text.slice(1);
+    let r    = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(textForApi)}&langpair=${sourceLang}|${targetLang}`);
     let data = await r.json();
-    return data[0].map(segment => segment[0]).join('');
+    if (data.responseStatus && data.responseStatus !== 200) {
+      console.error("Translation API error:", data.responseDetails);
+      return "تم الوصول للحد اليومي، حاول لاحقًا";
+    }
+    return data.responseData.translatedText;
   } catch (e) {
     console.error("Translation error:", e);
     return "خطأ في الاتصال";
@@ -1018,7 +1072,7 @@ function handleSearch() {
   updateCounter(results.length);
 
   if (results.length === 0) {
-    box.innerHTML = `<p style="color: #888;">لا توجد نتائج للبحث عن: "${query}"</p>`;
+    box.innerHTML = `<p style="color: #888;">لا توجد نتائج للبحث عن: "${escapeHtml(query)}"</p>`;
     return;
   }
 
@@ -1052,9 +1106,11 @@ function handleSearch() {
 }
 
 function highlightText(text, query) {
-  if (!query) return text;
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  return text.replace(regex, '<mark class="search-highlight">$1</mark>');
+  const safeText = escapeHtml(text);
+  if (!query) return safeText;
+  const safeQuery = escapeHtml(query);
+  const regex = new RegExp(`(${safeQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return safeText.replace(regex, '<mark class="search-highlight">$1</mark>');
 }
 
 function clearSearch() {
