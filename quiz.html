@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>فكّرني - Fakarny Translator</title>
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div id="main">
+    <h1>🧠 اختبار الكلمات - Quiz</h1>
+
+    <div id="topButtons">
+      <button onclick="clickSound(); goHome();" title="العودة للرئيسية">🏠 الرئيسية</button>
+      <button id="darkToggle" title="Change brightness">🌙 الوضع الداكن</button>
+    </div>
+
+    <!-- اختيار الجلسة -->
+    <div id="sessionSelector">
+      <h2>📚 اختر جلسة للاختبار</h2>
+      <select id="sessionSelect"></select>
+      <div id="wordCountInfo" style="margin-bottom: 14px; color: #888; font-size: 14px;"></div>
+      <button onclick="clickSound(); startQuiz();" id="startBtn">🚀 ابدأ الاختبار</button>
+    </div>
+
+    <!-- منطقة الاختبار -->
+    <div id="quizArea">
+
+      <!-- إحصائيات -->
+      <div id="statsBar">
+        <div class="stat-box">
+          <span id="statCorrect" class="stat-correct">0</span>
+          صح ✅
+        </div>
+        <div class="stat-box">
+          <span id="statWrong" class="stat-wrong">0</span>
+          غلط ❌
+        </div>
+        <div class="stat-box">
+          <span id="statRemaining" class="stat-total">0</span>
+          متبقي 📝
+        </div>
+      </div>
+
+      <!-- شريط التقدم -->
+      <div id="progressBar"><div id="progressFill"></div></div>
+      <div id="progressText"></div>
+
+      <!-- بطاقة السؤال -->
+      <div id="quizCard">
+        <div id="questionType"></div>
+        <div id="questionWord"></div>
+        <button id="listenBtn" onclick="listenQuestion()" title="استمع للكلمة">🔊 استمع</button>
+        <div id="optionsGrid"></div>
+        <div id="feedback"></div>
+        <button id="nextBtn" onclick="clickSound(); nextQuestion();">التالي ←</button>
+      </div>
+
+    </div>
+
+    <!-- شاشة النتيجة النهائية -->
+    <div id="resultScreen">
+      <h2 id="resultEmoji">🎉</h2>
+      <div id="resultScore"></div>
+      <div id="resultMessage"></div>
+      <button onclick="clickSound(); restartQuiz();" style="margin-left: 8px;">🔄 إعادة الاختبار</button>
+      <button onclick="clickSound(); goHome();">🏠 الرئيسية</button>
+    </div>
+
+  </div>
+
+  <script src="js/theme-common.js"></script>
+  <script src="js/quiz.js"></script>
+</body>
+</html>

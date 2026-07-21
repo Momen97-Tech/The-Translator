@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>فكّرني - Fakarny Translator</title>
+<meta name="description" content="فكّرني: أداة ترجمة فورية بين العربية والإنجليزية، مع حفظ الكلمات في جلسات منظمة، اختبارات تفاعلية لتثبيت المفردات، ونطق صوتي. مجاني بالكامل وبدون تسجيل.">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="فكّرني - Fakarny Translator">
+<meta property="og:description" content="ترجم كلماتك بين العربية والإنجليزية، احفظها في جلسات، واختبر نفسك فيها لاحقًا. أداة بسيطة ومجانية بالكامل.">
+<meta property="og:image" content="icon.png">
+<meta property="og:locale" content="ar_AR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="فكّرني - Fakarny Translator">
+<meta name="twitter:description" content="ترجم كلماتك بين العربية والإنجليزية، احفظها، واختبر نفسك فيها لاحقًا.">
+<meta name="twitter:image" content="icon.png">
+
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div id="sidebarOverlay"></div>
+
+  <div id="sidebar" class="hidden">
+    <button id="closeSidebarBtn" onclick="closeSidebar(); clickSound();" title="إغلاق القائمة">✖</button>
+    <h3>الجلسات</h3>
+    <div id="sessionList"></div>
+    <button onclick="newSession(); clickSound();" title="New session">+ جلسة جديدة</button>
+  </div>
+
+  <div id="main">
+    <h1>فكّرني - Fakarny Translator</h1>
+
+    <div id="topButtons">
+      <button id="toggleSidebar" title="Side menu">☰</button>
+      <button onclick="clickSound(); window.location.href='quiz.html'" title="Quiz">🧠 الاختبار</button>
+      <button id="darkToggle" title="Change brightness">🌙 الوضع الداكن</button>
+    </div>
+
+    <h2 id="currentSessionDisplay" title="جلسة العمل الحالية"></h2>
+
+    <div id="translation-area">
+      <div id="input-box" class="translator-box">
+        <textarea id="inputWord" placeholder="اكتب النص هنا..." oninput="handleInput()"></textarea>
+        <button class="speak-btn" id="speakInput" onclick="toggleSpeak('inputWord', 'speakInput')" title="Listen">🔊</button>
+      </div>
+
+      <div id="output-box" class="translator-box">
+        <textarea id="outputWord" placeholder="الترجمة..." title="يمكنك تعديل الترجمة قبل الحفظ" oninput="autoResize()"></textarea>
+        <button class="speak-btn" id="speakOutput" onclick="toggleSpeak('outputWord', 'speakOutput')" title="Listen">🔊</button>
+      </div>
+    </div>
+
+    <div id="actionButtons">
+      <button onclick="saveWord(); clickSound();" title="Save">💾</button>
+      <button onclick="clearOutput(); clickSound();" title="Delete">✖</button>
+    </div>
+
+    <h3>الكلمات المحفوظة - Saved words 💾</h3>
+
+    <!-- عداد الكلمات -->
+    <div id="wordCounter" title="Counter">
+      📚 عدد الكلمات: <span id="counterNumber">0</span>
+    </div>
+
+    <!-- حقل البحث -->
+    <div id="searchContainer">
+      <input type="text" id="searchInput" placeholder="🔍 ابحث في الكلمات المحفوظة..." oninput="handleSearch()" title="Searching"/>
+      <button id="clearSearch" onclick="clearSearch(); clickSound();" title="مسح البحث">✖</button>
+    </div>
+
+    <div id="savedWords" class="word-list"></div>
+
+    <div id="siteFooter">
+      <a href="about.html">عن التطبيق</a> · <a href="privacy-policy.html">سياسة الخصوصية</a>
+    </div>
+  </div>
+
+  <script src="js/theme-common.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
