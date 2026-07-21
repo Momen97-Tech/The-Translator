@@ -1,22 +1,116 @@
-# The-Translator
-The Smart Translator 🚀
-A modern, productivity-focused translation tool that allows users to organize translations into separate sessions and save them for future reference.
+# 🚀 فكّرني - Fakarny Translator
 
-✨ Key Features
-Session-Based Organization: Group translations into custom projects or topics.
-Smart Vocabulary List: Save word pairs instantly and organize them via Drag & Drop.
-Full Dark Mode: A seamless, eye-friendly UI designed with Tailwind CSS.
-Voice Integration (TTS): Accurate pronunciation for both English and Arabic.
-Real-Time Translation: Instant results with built-in debouncing for performance.
-Responsive Design: Fully optimized for mobile, tablet, and desktop.
+أداة ترجمة مجانية بين العربية والإنجليزية، تساعدك على تنظيم وحفظ الكلمات الجديدة في جلسات منفصلة، مع إمكانية مراجعتها واختبار نفسك لاحقًا.
 
-🛠️ Tech Stack
-Frontend: HTML5, JavaScript (ES6+), Tailwind CSS.
-APIs: Google Translate API, Web Speech API (TTS).
-Storage: Persistent local storage for user data.
+🔗 **جرّب التطبيق مباشرة:**
+https://momen97-tech.github.io/The-Translator/
 
-🚀 Quick Start
-Type your text; translation appears automatically.
-Click "Save" to add the word pair to your current session.
-Manage sessions via the sidebar to keep your learning organized.
-Toggle Dark Mode (🌙) for night-time comfort.
+---
+
+## ✨ المميزات
+
+### 🔤 الترجمة
+
+* ترجمة فورية بين العربية والإنجليزية أثناء الكتابة.
+* استخدام **Debouncing** لتقليل عدد الطلبات وتحسين الأداء.
+* إمكانية **تعديل الترجمة يدويًا** قبل الحفظ.
+
+### 🧠 تنظيم التعلم
+
+* تقسيم الكلمات إلى **جلسات منفصلة** حسب الموضوع.
+* دعم **إعادة التسمية والحذف** للجلسات.
+* ترتيب الكلمات داخل الجلسة باستخدام **Drag & Drop**.
+
+### 🔍 البحث والتفاعل
+
+* بحث فوري داخل الكلمات المحفوظة.
+* تمييز (Highlight) النتائج لتسهيل الوصول.
+
+### 📝 الاختبار (Quiz)
+
+* اختبار تفاعلي لكل جلسة.
+* عرض **شريط تقدم** وإحصائيات لحظية:
+
+  * عدد الإجابات الصحيحة
+  * عدد الأخطاء
+  * الكلمات المتبقية
+
+### 🔊 النطق الصوتي
+
+* دعم نطق الكلمات بالعربية والإنجليزية.
+* باستخدام **Web Speech API**.
+
+### 🌙 واجهة المستخدم
+
+* وضع داكن (Dark Mode) مريح للعين.
+* حفظ الإعداد تلقائيًا بين الزيارات.
+
+### 🔒 الخصوصية
+
+* لا يتم تخزين أي بيانات على سيرفرات خارجية.
+* جميع البيانات محفوظة محليًا باستخدام **LocalStorage**.
+
+---
+
+## 🛠️ التقنيات المستخدمة
+
+* **Frontend:**
+  HTML5, CSS3 (باستخدام CSS Variables)، JavaScript (Vanilla ES6+)
+
+* **الترجمة:**
+  MyMemory Translation API
+
+* **النطق الصوتي:**
+  Web Speech API (SpeechSynthesis)
+
+* **التخزين:**
+  LocalStorage (بدون Backend)
+
+---
+
+## 📁 هيكل المشروع
+
+```
+The-Translator/
+├── index.html              # الصفحة الرئيسية (أداة الترجمة)
+├── quiz.html               # صفحة الاختبار
+├── about.html              # معلومات عن التطبيق
+├── privacy-policy.html     # سياسة الخصوصية
+├── icon.png                # أيقونة الموقع
+├── click.mp3               # صوت الأزرار
+└── README.md
+```
+
+---
+
+## 🚀 التشغيل محليًا
+
+المشروع **Static بالكامل** (بدون Backend)، ويمكن تشغيله بسهولة:
+
+* فتح ملف `index.html` مباشرة في المتصفح
+  أو
+* استخدام Local Server مثل **Live Server** في VS Code
+
+---
+
+## 🔒 الخصوصية والأمان
+
+* لا يوجد أي Backend أو قواعد بيانات خارجية.
+* يتم إرسال النصوص فقط إلى خدمة الترجمة (MyMemory) لغرض الترجمة.
+* تم حماية التطبيق من ثغرات **XSS** عبر تعقيم (Escaping) مدخلات المستخدم.
+
+📄 سياسة الخصوصية:
+https://momen97-tech.github.io/The-Translator/privacy-policy.html
+
+---
+
+## 👨‍💻 المطور
+
+**Momen Ahmed**
+مطوّر ويب ومدرّس تكنولوجيا معلومات
+
+---
+
+## 📄 الترخيص
+
+هذا المشروع مفتوح المصدر للاستخدامات التعليمية والشخصية.
